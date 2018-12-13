@@ -1,5 +1,5 @@
 import test from 'ava';
-import generate from '../dist/index';
+const jst = require('../dist/index');
 import _ from 'lodash';
 const validator = require('validator');
 
@@ -7,7 +7,7 @@ const userSchema = require('./user.json');
 
 test('should generate test data with differnte variations based on required property', t => {
   const required = userSchema.required;
-  const data = generate(userSchema);
+  const data = jst.generate(userSchema);
 
   // should have data that has all required fields
   let found = _.some(data, d => {
@@ -34,13 +34,13 @@ test('should generate test data with differnte variations based on required prop
 
 test('should generate test data with negative type tests for simple primitive data types', t => {
   const required = userSchema.required;
-  const data = generate(userSchema);
+  const data = jst.generate(userSchema);
 
   required.forEach(req => {
     const found = _.chain(data)
       .filter(d => (d.valid === false) && (d.property && d.property === req) && (typeof d.data[req] !== 'undefined'))
       .some(d => {
-        const types = generate.getNegativeTypes(userSchema.properties[req]);
+        const types = jst.generate.getNegativeTypes(userSchema.properties[req]);
         const dataType = d.data[req] === null ? 'null' : typeof d.data[req];
         const check = types.indexOf(dataType) >= 0;
         return check;
@@ -64,7 +64,7 @@ test('should create negative for number multipleOf', t => {
     required: ['foo']
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const required = schema.required;
 
   required.forEach(req => {
@@ -92,7 +92,7 @@ test('should create negative for number maximum', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && typeof d.data.foo === 'number')
     .some(d => d.data.foo && d.data.foo > 3)
@@ -114,7 +114,7 @@ test('should create negative for number minimum', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && typeof d.data.foo === 'number')
     .some(d => d.data.foo && d.data.foo < 3)
@@ -136,7 +136,7 @@ test('should create negative for string maxLength', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && typeof d.data.foo === 'string')
     .some(d => d.data.foo && d.data.foo.length > 5)
@@ -158,7 +158,7 @@ test('should create negative for string minLength', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && typeof d.data.foo === 'string')
     .some(d => d.data.foo && d.data.foo.length < 5)
@@ -180,7 +180,7 @@ test('should create negative for string pattern date-time', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && typeof d.data.foo === 'string')
     .some(d => d.data.foo && isNaN(Date.parse(d.data.foo)))
@@ -202,7 +202,7 @@ test('should create negative for string pattern email', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && typeof d.data.foo === 'string')
     .some(d => d.data.foo && !validator.isEmail(d.data.foo))
@@ -224,7 +224,7 @@ test('should create negative for string pattern uri', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && typeof d.data.foo === 'string')
     .some(d => d.data.foo && !validator.isURL(d.data.foo))
@@ -249,7 +249,7 @@ test('should create negative for array property maxItems', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && Array.isArray(d.data.foo))
     .some(d => d.data.foo && d.data.foo.length > 5)
@@ -274,7 +274,7 @@ test('should create negative for array property minItems', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && Array.isArray(d.data.foo))
     .some(d => d.data.foo && d.data.foo.length < 5)
@@ -299,7 +299,7 @@ test('should create negative for array property uniqueItems', t => {
     }
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
   const found = _.chain(data)
     .filter(d => d.valid === false && Array.isArray(d.data.foo))
     .some(d => d.data.foo && _.uniq(d.data.foo).length < d.data.foo.length)
@@ -315,7 +315,7 @@ test('should create negative simple type schema', t => {
     type: 'string'
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
 
   const found = _.chain(data)
     .filter(d => d.valid === false)
@@ -333,7 +333,7 @@ test('should create negative simple type schema and additional properties', t =>
     minimum: 5
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
 
   const found = _.chain(data)
     .filter(d => d.valid === false)
@@ -363,7 +363,7 @@ test('should create negative test data for schema with array', t => {
     required: ['name', 'foos']
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
 
   const found = _.chain(data)
     .filter(d => d.valid === false && d.data && Array.isArray(d.data.foos))
@@ -394,7 +394,7 @@ test('should create negative test data for schema with array and minItems proper
     required: ['name', 'foos']
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
 
   const found = _.chain(data)
     .filter(d => d.valid === false && d.data && Array.isArray(d.data.foos))
@@ -426,7 +426,7 @@ test('should create negative test data for nested object property', t => {
     required: ['name', 'foo']
   };
 
-  const data = generate(schema);
+  const data = jst.generate(schema);
 
   const found = _.chain(data)
     .filter(d => d.valid === false && d.data && d.data.foo && typeof d.data.foo.bar !== 'undefined')
@@ -436,4 +436,14 @@ test('should create negative test data for nested object property', t => {
   t.is(found.length, 2);
 
   t.pass();
+});
+
+test('generate_simple: should generate a single test data object all required fields', t => {
+  const required = userSchema.required;
+  const data = jst.generate_simple(userSchema);
+
+  // should have data that has all required fields
+  const keys = Object.keys(data);
+  const diff = _.difference(required, keys);
+  t.true(diff.length === 0);
 });
