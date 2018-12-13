@@ -1,33 +1,52 @@
 #!/usr/bin/env node
+'use strict';
 
 var path = require('path');
 var generate = require('../dist');
 var param = process.argv[2];
 var fs = require('fs');
 var version = require('../package.json').version;
+var ArgumentParser = require('argparse').ArgumentParser;
 
-if (!param) {
-  console.log('must specify a schema file');
-  process.exit(234);
-}
+var parser = new ArgumentParser({
+  addHelp:true,
+  description: 'Tool that generates test data from provided Schema'
+});
 
-if (param === '-v' || param === '--version') {
+parser.addArgument(
+  ['-v', '--version'],
+  {
+    help: 'Print version',
+    action: 'storeTrue'
+  }
+);
+
+parser.addArgument(
+  ['schema_file'],
+  {
+    help: 'Path to JSON Schema'
+  }
+);
+
+var args = parser.parseArgs()
+
+if (args.version) {
   console.log(version);
   process.exit(0);
 }
 
-if (param === '-h' || param === '--help') {
-  console.log('Usage:\n\tjstdgen schema.json');
-  process.exit(0);
+if (!args.schema_file) {
+  console.log('must specify a schema file');
+  process.exit(234);
 }
 
-var ext = path.extname(param);
+var ext = path.extname(args.schema_file);
 if (!ext || ext !== '.json') {
   console.log('must specify a schema file');
   process.exit(234);
 }
 
-var schemaStr = fs.readFileSync(param, 'utf8');
+var schemaStr = fs.readFileSync(args.schema_file, 'utf8');
 var schema;
 try {
   schema = JSON.parse(schemaStr);

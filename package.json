@@ -30,7 +30,8 @@
     "chance": "~1.0.0",
     "json-schema-faker": "^0.2.15",
     "lodash": "^4.7.0",
-    "prop-search": "~1.0.0"
+    "prop-search": "~1.0.0",
+    "argparse": "~1.0.10"
   },
   "devDependencies": {
     "ava": "~0.13.0",
