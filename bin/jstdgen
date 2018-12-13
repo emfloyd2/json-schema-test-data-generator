@@ -2,7 +2,7 @@
 'use strict';
 
 var path = require('path');
-var generate = require('../dist');
+var jst = require('../dist');
 var param = process.argv[2];
 var fs = require('fs');
 var version = require('../package.json').version;
@@ -12,6 +12,14 @@ var parser = new ArgumentParser({
   addHelp:true,
   description: 'Tool that generates test data from provided Schema'
 });
+
+parser.addArgument(
+  ['--simple', '-s'],
+  {
+    help: 'Generate single, valid JSON payload',
+    action: 'storeTrue'
+  }
+);
 
 parser.addArgument(
   ['-v', '--version'],
@@ -55,4 +63,9 @@ try {
   process.exit(234);
 }
 
-console.log(JSON.stringify(generate(schema)));
+if (!args.simple) {
+  var payload = jst.generate(schema);
+} else {
+  var payload = jst.generate_simple(schema);
+}
+console.log(JSON.stringify(payload));
